@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Star, ShoppingBag, Heart } from "lucide-react";
 import { Product } from "@/lib/types";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -15,12 +16,14 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null;
+
+  const isWishlisted = isInWishlist(product.id);
 
   return (
     <motion.div
@@ -54,8 +57,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
       <motion.button
         initial={false}
-        animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
-        onClick={() => setIsWishlisted(!isWishlisted)}
+        animate={{ opacity: isHovered || isWishlisted ? 1 : 0, scale: isHovered || isWishlisted ? 1 : 0.8 }}
+        onClick={(e) => {
+          e.preventDefault();
+          toggleWishlist(product.id);
+        }}
         className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-stone-50 transition-colors"
       >
         <Heart
