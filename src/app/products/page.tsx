@@ -5,12 +5,17 @@ import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products, categories, brands } from "@/lib/data";
-import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { getProducts, getCategories } from "@/lib/supabase-api";
+import { Product, Category } from "@/lib/types";
+import { Search, SlidersHorizontal, X, ChevronDown, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [selectedBrand, setSelectedBrand] = useState("");
@@ -20,10 +25,33 @@ function ProductsContent() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
+    async function loadData() {
+      try {
+        const [allProducts, allCategories] = await Promise.all([
+          getProducts(),
+          getCategories(),
+        ]);
+        setProducts(allProducts);
+        setCategories(allCategories);
+      } catch (error) {
+        console.error("Failed to load products data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");
     setSelectedCategory(searchParams.get("category") || "");
     setSelectedTag(searchParams.get("tag") || "");
   }, [searchParams]);
+
+  const brands = useMemo(() => {
+    const allBrands = products.map(p => p.brand);
+    return Array.from(new Set(allBrands)).sort();
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
@@ -74,7 +102,7 @@ function ProductsContent() {
     }
 
     return result;
-  }, [searchQuery, selectedCategory, selectedBrand, selectedTag, priceRange, sortBy]);
+  }, [products, searchQuery, selectedCategory, selectedBrand, selectedTag, priceRange, sortBy]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -87,6 +115,18 @@ function ProductsContent() {
 
   const hasActiveFilters =
     searchQuery || selectedCategory || selectedBrand || selectedTag || priceRange[0] > 0 || priceRange[1] < 500;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -107,7 +147,7 @@ function ProductsContent() {
           </button>
 
           <AnimatePresence>
-            {(isFilterOpen || typeof window !== "undefined" && window.innerWidth >= 1024) && (
+            {(isFilterOpen || (typeof window !== "undefined" && window.innerWidth >= 1024)) && (
               <motion.aside
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -322,6 +362,15 @@ function ProductsContent() {
     </div>
   );
 }
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-stone-50" />}>
+      <ProductsContent />
+    </Suspense>
+  );
+}
+
 
 export default function ProductsPage() {
   return (
