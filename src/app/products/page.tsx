@@ -6,8 +6,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products, categories, brands } from "@/lib/data";
-import { CartProvider } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -327,12 +325,8 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Suspense fallback={<div className="min-h-screen bg-stone-50" />}>
-          <ProductsContent />
-        </Suspense>
-      </CartProvider>
-    </AuthProvider>
+    <Suspense fallback={<div className="min-h-screen bg-stone-50" />}>
+      <ProductsContent />
+    </Suspense>
   );
 }
