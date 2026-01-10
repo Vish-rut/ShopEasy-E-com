@@ -15,19 +15,28 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+  export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("shopeasy-cart");
     if (savedCart) {
-      setItems(JSON.parse(savedCart));
+      try {
+        setItems(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Failed to parse cart from localStorage", error);
+      }
     }
+    setIsInitialized(true);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("shopeasy-cart", JSON.stringify(items));
-  }, [items]);
+    if (isInitialized) {
+      localStorage.setItem("shopeasy-cart", JSON.stringify(items));
+    }
+  }, [items, isInitialized]);
+
 
   const addToCart = (product: Product, quantity = 1, size?: string, color?: string) => {
     setItems((prev) => {
