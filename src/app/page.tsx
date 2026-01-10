@@ -367,32 +367,13 @@ function TestimonialsSection() {
 }
 
 export default function HomePage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, loading: catsLoading } = useRealtimeCategories();
+  const { products: trendingProducts, loading: trendingLoading } = useRealtimeProducts({ tag: "trending", limit: 4 });
+  const { products: newArrivals, loading: newLoading } = useRealtimeProducts({ tag: "new", limit: 4 });
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [cats, trending, arrivals] = await Promise.all([
-          getCategories(),
-          getProducts({ tag: "trending", limit: 4 }),
-          getProducts({ tag: "new", limit: 4 }),
-        ]);
-        setCategories(cats);
-        setTrendingProducts(trending);
-        setNewArrivals(arrivals);
-      } catch (error) {
-        console.error("Failed to load home page data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  const isLoading = catsLoading || trendingLoading || newLoading;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
