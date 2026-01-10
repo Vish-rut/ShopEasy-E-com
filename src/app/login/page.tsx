@@ -170,11 +170,5 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <LoginContent />
-      </CartProvider>
-    </AuthProvider>
-  );
+  return <LoginContent />;
 }
