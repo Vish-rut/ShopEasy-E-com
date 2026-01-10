@@ -26,7 +26,7 @@ export const categories: Category[] = [
     id: "4",
     name: "Sports",
     slug: "sports",
-    image: "https://images.unsplash.com/photo-1461896836934- voices-58f23-5a8ff?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
     productCount: 87,
   },
   {
