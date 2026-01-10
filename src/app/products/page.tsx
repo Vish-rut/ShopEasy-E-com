@@ -370,12 +370,3 @@ export default function ProductsPage() {
     </Suspense>
   );
 }
-
-
-export default function ProductsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-stone-50" />}>
-      <ProductsContent />
-    </Suspense>
-  );
-}
