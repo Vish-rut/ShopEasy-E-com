@@ -1,27 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/data";
-import { CartProvider, useCart } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Star, Minus, Plus, ShoppingBag, Heart, Truck, Shield, RotateCcw, ChevronLeft } from "lucide-react";
+import { getProductById, getProducts } from "@/lib/supabase-api";
+import { Product } from "@/lib/types";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { Star, Minus, Plus, ShoppingBag, Heart, Truck, Shield, RotateCcw, ChevronLeft, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-function ProductDetailContent() {
+export default function ProductDetailPage() {
   const params = useParams();
-  const product = products.find((p) => p.id === params.id);
+  const productId = params.id as string;
   const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || "");
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || "");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [activeImage, setActiveImage] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const prod = await getProductById(productId);
+        if (prod) {
+          setProduct(prod);
+          setSelectedColor(prod.colors?.[0] || "");
+          setSelectedSize(prod.sizes?.[0] || "");
+          
+          const related = await getProducts({ category: prod.category, limit: 5 });
+          setRelatedProducts(related.filter(p => p.id !== productId).slice(0, 4));
+        }
+      } catch (error) {
+        console.error("Failed to load product detail data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -41,10 +79,6 @@ function ProductDetailContent() {
     );
   }
 
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
-
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedSize, selectedColor);
   };
@@ -54,6 +88,7 @@ function ProductDetailContent() {
     : null;
 
   const images = product.images || [product.image];
+  const isWishlisted = isInWishlist(product.id);
 
   return (
     <div className="min-h-screen bg-white">
@@ -227,7 +262,7 @@ function ProductDetailContent() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setIsWishlisted(!isWishlisted)}
+                onClick={() => toggleWishlist(product.id)}
                 className={`p-4 rounded-xl border transition-colors ${
                   isWishlisted
                     ? "bg-red-50 border-red-200 text-red-500"
@@ -269,15 +304,5 @@ function ProductDetailContent() {
       </main>
       <Footer />
     </div>
-  );
-}
-
-export default function ProductDetailPage() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <ProductDetailContent />
-      </CartProvider>
-    </AuthProvider>
   );
 }
