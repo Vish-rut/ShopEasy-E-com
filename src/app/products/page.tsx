@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { getProducts, getCategories } from "@/lib/supabase-api";
-import { Product, Category } from "@/lib/types";
+import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
+import { useRealtimeCategories } from "@/hooks/useRealtimeCategories";
 import { Search, SlidersHorizontal, X, ChevronDown, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
