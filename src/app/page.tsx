@@ -7,8 +7,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products, categories } from "@/lib/data";
-import { CartProvider } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 
 function HeroSection() {
@@ -372,22 +370,18 @@ function TestimonialsSection() {
 
 export default function HomePage() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <div className="min-h-screen bg-white">
-          <Header />
-          <main>
-            <HeroSection />
-            <FeaturesSection />
-            <CategoriesSection />
-            <TrendingSection />
-            <PromoBanner />
-            <NewArrivalsSection />
-            <TestimonialsSection />
-          </main>
-          <Footer />
-        </div>
-      </CartProvider>
-    </AuthProvider>
+    <div className="min-h-screen bg-white">
+      <Header />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <CategoriesSection />
+        <TrendingSection />
+        <PromoBanner />
+        <NewArrivalsSection />
+        <TestimonialsSection />
+      </main>
+      <Footer />
+    </div>
   );
 }
