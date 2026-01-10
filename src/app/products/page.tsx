@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const { products: allProducts, loading: prodsLoading } = useRealtimeProducts();
+  const { products, loading: prodsLoading } = useRealtimeProducts();
   const { categories, loading: catsLoading } = useRealtimeCategories();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
