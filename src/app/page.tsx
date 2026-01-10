@@ -1,12 +1,14 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Truck, Shield, CreditCard, HeadphonesIcon, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Truck, Shield, CreditCard, HeadphonesIcon, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products, categories } from "@/lib/data";
+import { getProducts, getCategories } from "@/lib/supabase-api";
+import { Product, Category } from "@/lib/types";
 import { motion } from "framer-motion";
 
 function HeroSection() {
@@ -135,7 +137,7 @@ function FeaturesSection() {
   );
 }
 
-function CategoriesSection() {
+function CategoriesSection({ categories }: { categories: Category[] }) {
   return (
     <section className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -185,9 +187,7 @@ function CategoriesSection() {
   );
 }
 
-function TrendingSection() {
-  const trendingProducts = products.filter(p => p.tags?.includes("trending") || p.tags?.includes("bestseller")).slice(0, 4);
-
+function TrendingSection({ products }: { products: Product[] }) {
   return (
     <section className="py-16 bg-stone-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -205,7 +205,7 @@ function TrendingSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingProducts.map((product, i) => (
+          {products.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
@@ -276,9 +276,7 @@ function PromoBanner() {
   );
 }
 
-function NewArrivalsSection() {
-  const newProducts = products.filter(p => p.tags?.includes("new")).slice(0, 4);
-
+function NewArrivalsSection({ products }: { products: Product[] }) {
   return (
     <section className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -296,7 +294,7 @@ function NewArrivalsSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newProducts.map((product, i) => (
+          {products.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
@@ -369,16 +367,49 @@ function TestimonialsSection() {
 }
 
 export default function HomePage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [cats, trending, arrivals] = await Promise.all([
+          getCategories(),
+          getProducts({ tag: "trending", limit: 4 }),
+          getProducts({ tag: "new", limit: 4 }),
+        ]);
+        setCategories(cats);
+        setTrendingProducts(trending);
+        setNewArrivals(arrivals);
+      } catch (error) {
+        console.error("Failed to load home page data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <main>
         <HeroSection />
         <FeaturesSection />
-        <CategoriesSection />
-        <TrendingSection />
+        <CategoriesSection categories={categories} />
+        <TrendingSection products={trendingProducts} />
         <PromoBanner />
-        <NewArrivalsSection />
+        <NewArrivalsSection products={newArrivals} />
         <TestimonialsSection />
       </main>
       <Footer />
