@@ -21,34 +21,29 @@ export default function ProductDetailPage() {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { product, loading: prodLoading } = useRealtimeProduct(productId);
+  const { products: allProducts, loading: relatedLoading } = useRealtimeProducts({ 
+    category: product?.category, 
+    limit: 5 
+  });
+  
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const prod = await getProductById(productId);
-        if (prod) {
-          setProduct(prod);
-          setSelectedColor(prod.colors?.[0] || "");
-          setSelectedSize(prod.sizes?.[0] || "");
-          
-          const related = await getProducts({ category: prod.category, limit: 5 });
-          setRelatedProducts(related.filter(p => p.id !== productId).slice(0, 4));
-        }
-      } catch (error) {
-        console.error("Failed to load product detail data:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (product) {
+      setSelectedColor(prev => prev || product.colors?.[0] || "");
+      setSelectedSize(prev => prev || product.sizes?.[0] || "");
     }
-    loadData();
-  }, [productId]);
+  }, [product]);
+
+  const loading = prodLoading || (relatedLoading && !product);
+
+  const relatedProducts = allProducts
+    .filter(p => p.id !== productId)
+    .slice(0, 4);
 
   if (loading) {
     return (
