@@ -5,11 +5,13 @@ import { useState } from "react";
 import { ShoppingBag, Search, User, Menu, X, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
   const { itemCount } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
+  const { wishlist } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +22,8 @@ export function Header() {
       window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
     }
   };
+
+  const wishlistCount = wishlist.length;
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -86,10 +90,19 @@ export function Header() {
 
             <Link
               href="/wishlist"
-              className="hidden sm:flex p-2 rounded-full hover:bg-stone-100 transition-colors"
+              className="relative p-2 rounded-full hover:bg-stone-100 transition-colors"
               aria-label="Wishlist"
             >
               <Heart className="h-5 w-5 text-stone-600" />
+              {wishlistCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] font-medium flex items-center justify-center"
+                >
+                  {wishlistCount}
+                </motion.span>
+              )}
             </Link>
 
             {isAuthenticated ? (
@@ -190,6 +203,17 @@ export function Header() {
                   >
                     Sign In
                   </Link>
+                )}
+                {isAuthenticated && (
+                   <button
+                   onClick={() => {
+                     logout();
+                     setIsMenuOpen(false);
+                   }}
+                   className="mx-4 mt-2 px-4 py-2 text-sm font-medium text-center text-stone-600 border border-stone-200 rounded-full"
+                 >
+                   Logout
+                 </button>
                 )}
               </nav>
             </motion.div>
