@@ -222,11 +222,5 @@ function RegisterContent() {
 }
 
 export default function RegisterPage() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <RegisterContent />
-      </CartProvider>
-    </AuthProvider>
-  );
+  return <RegisterContent />;
 }
