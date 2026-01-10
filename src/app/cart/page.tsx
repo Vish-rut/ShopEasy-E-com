@@ -245,11 +245,5 @@ function CartContent() {
 }
 
 export default function CartPage() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <CartContent />
-      </CartProvider>
-    </AuthProvider>
-  );
+  return <CartContent />;
 }
