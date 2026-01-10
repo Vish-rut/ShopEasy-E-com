@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { User } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 interface AuthContextType {
   user: User | null;
@@ -9,53 +10,72 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("shopeasy-user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.user_metadata.name || session.user.email?.split("@")[0] || "User",
+        });
+      }
+      setIsLoading(false);
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.user_metadata.name || session.user.email?.split("@")[0] || "User",
+        });
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    if (email && password.length >= 6) {
-      const newUser: User = {
-        id: "1",
-        email,
-        name: email.split("@")[0],
-      };
-      setUser(newUser);
-      localStorage.setItem("shopeasy-user", JSON.stringify(newUser));
-      return true;
-    }
-    return false;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return !error;
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    if (name && email && password.length >= 6) {
-      const newUser: User = {
-        id: "1",
-        email,
-        name,
-      };
-      setUser(newUser);
-      localStorage.setItem("shopeasy-user", JSON.stringify(newUser));
-      return true;
-    }
-    return false;
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+    return !error;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("shopeasy-user");
   };
 
   return (
@@ -66,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
+        isLoading,
       }}
     >
       {children}
