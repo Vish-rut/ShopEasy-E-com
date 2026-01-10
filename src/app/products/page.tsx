@@ -12,35 +12,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products: allProducts, loading: prodsLoading } = useRealtimeProducts();
+  const { categories, loading: catsLoading } = useRealtimeCategories();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedTag, setSelectedTag] = useState(searchParams.get("tag") || "");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState("featured");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [allProducts, allCategories] = await Promise.all([
-          getProducts(),
-          getCategories(),
-        ]);
-        setProducts(allProducts);
-        setCategories(allCategories);
-      } catch (error) {
-        console.error("Failed to load products data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  const loading = prodsLoading || catsLoading;
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") || "");
