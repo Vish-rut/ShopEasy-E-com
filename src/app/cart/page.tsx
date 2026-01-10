@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CartProvider, useCart } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, CreditCard, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
