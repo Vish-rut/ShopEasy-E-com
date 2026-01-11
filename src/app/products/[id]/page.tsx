@@ -269,12 +269,12 @@ export default function ProductDetailPage() {
               </motion.button>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-stone-200">
-              {[
-                { icon: Truck, label: "Free Shipping", desc: "Orders over $50" },
-                { icon: Shield, label: "Secure Payment", desc: "100% secure" },
-                { icon: RotateCcw, label: "Easy Returns", desc: "30 days" },
-              ].map((feature) => (
+              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-stone-200">
+                {[
+                  { icon: Truck, label: "Free Shipping", desc: "Orders over ₹500" },
+                  { icon: Shield, label: "Secure Payment", desc: "100% secure" },
+                  { icon: RotateCcw, label: "Easy Returns", desc: "30 days" },
+                ].map((feature) => (
                 <div key={feature.label} className="text-center">
                   <div className="h-10 w-10 mx-auto mb-2 rounded-lg bg-amber-100 flex items-center justify-center">
                     <feature.icon className="h-5 w-5 text-amber-600" />
