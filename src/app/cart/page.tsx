@@ -8,12 +8,51 @@ import { useCart } from "@/contexts/CartContext";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, CreditCard, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { User, LogIn } from "lucide-react";
+
 function CartContent() {
-  const { items, updateQuantity, removeFromCart, total, clearCart } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  const { items, updateQuantity, removeFromCart, total, clearCart, loading: cartLoading } = useCart();
 
   const shipping = total > 500 ? 0 : 99;
   const tax = total * 0.12;
   const grandTotal = total + shipping + tax;
+
+  if (authLoading || cartLoading) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center py-16">
+            <div className="h-32 w-32 mx-auto mb-8 rounded-full bg-stone-100 flex items-center justify-center">
+              <User className="h-16 w-16 text-stone-300" />
+            </div>
+            <h1 className="text-3xl font-bold text-stone-900 mb-4">Please login to view your cart</h1>
+            <p className="text-stone-500 mb-8 max-w-md mx-auto">
+              You need to be signed in to add items to your cart and proceed with your purchase.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-amber-500/25 transition-all"
+            >
+              <LogIn className="h-5 w-5" />
+              Login Now
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
