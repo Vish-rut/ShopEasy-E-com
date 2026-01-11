@@ -176,7 +176,7 @@ function CategoriesSection({ categories }: { categories: Category[] }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-white font-semibold">{category.name}</h3>
-                  <p className="text-white/70 text-sm">{category.productCount} Products</p>
+                  
                 </div>
               </Link>
             </motion.div>
