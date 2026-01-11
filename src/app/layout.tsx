@@ -39,11 +39,12 @@ export default function RootLayout({
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
         <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-          </CartProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+                <Toaster position="top-right" expand={false} richColors />
+              </WishlistProvider>
+            </CartProvider>
         </AuthProvider>
         <VisualEditsMessenger />
       </body>
