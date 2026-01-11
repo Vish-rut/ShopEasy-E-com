@@ -306,7 +306,7 @@ function NewArrivalsSection({ products }: { products: Product[] }) {
 function TestimonialsSection() {
   const testimonials = [
     {
-      name: "Sarah Johnson",
+      name: "Sarah Agrawal",
       role: "Verified Buyer",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
       content: "Amazing quality products and super fast delivery. ShopEasy has become my go-to store for everything!",
