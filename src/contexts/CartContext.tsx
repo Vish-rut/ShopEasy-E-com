@@ -26,14 +26,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const fetchCart = async () => {
     if (!user) {
-      const savedCart = localStorage.getItem("shopeasy-cart");
-      if (savedCart) {
-        try {
-          setItems(JSON.parse(savedCart));
-        } catch (error) {
-          console.error("Failed to parse cart from localStorage", error);
-        }
-      }
+      setItems([]);
       setLoading(false);
       setIsInitialized(true);
       return;
@@ -62,7 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             originalPrice: item.product.original_price ? parseFloat(item.product.original_price) : undefined,
             image: item.product.image_url,
             images: item.product.images,
-            category: item.product.category_id, // Note: this might need a join for category name if needed
+            category: item.product.category_id,
             brand: item.product.brand,
             rating: parseFloat(item.product.rating),
             reviewCount: item.product.review_count,
@@ -113,88 +106,61 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
   }, [user]);
 
-  useEffect(() => {
-    if (isInitialized && !user) {
-      localStorage.setItem("shopeasy-cart", JSON.stringify(items));
-    }
-  }, [items, isInitialized, user]);
-
   const addToCart = async (product: Product, quantity = 1, size?: string, color?: string) => {
-    if (user) {
-      try {
-        // Check if item already exists to increment quantity
-        const { data: existing } = await supabase
+    if (!user) return;
+
+    try {
+      // Check if item already exists to increment quantity
+      const { data: existing } = await supabase
+        .from('cart_items')
+        .select('id, quantity')
+        .match({ 
+          user_id: user.id, 
+          product_id: product.id, 
+          selected_size: size || null, 
+          selected_color: color || null 
+        })
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
           .from('cart_items')
-          .select('id, quantity')
-          .match({ 
-            user_id: user.id, 
-            product_id: product.id, 
-            selected_size: size || null, 
-            selected_color: color || null 
-          })
-          .single();
-
-        if (existing) {
-          const { error } = await supabase
-            .from('cart_items')
-            .update({ quantity: existing.quantity + quantity })
-            .eq('id', existing.id);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from('cart_items')
-            .insert({
-              user_id: user.id,
-              product_id: product.id,
-              quantity,
-              selected_size: size,
-              selected_color: color
-            });
-          if (error) throw error;
-        }
-      } catch (error) {
-        console.error("Error adding to cart:", error);
+          .update({ quantity: existing.quantity + quantity })
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: user.id,
+            product_id: product.id,
+            quantity,
+            selected_size: size,
+            selected_color: color
+          });
+        if (error) throw error;
       }
-    } else {
-      setItems((prev) => {
-        const existingIndex = prev.findIndex(
-          (item) =>
-            item.product.id === product.id &&
-            item.selectedSize === size &&
-            item.selectedColor === color
-        );
-
-        if (existingIndex > -1) {
-          const updated = [...prev];
-          updated[existingIndex].quantity += quantity;
-          return updated;
-        }
-
-        return [...prev, { product, quantity, selectedSize: size, selectedColor: color }];
-      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
     }
   };
 
   const removeFromCart = async (productId: string, size?: string, color?: string) => {
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('cart_items')
-          .delete()
-          .match({ 
-            user_id: user.id, 
-            product_id: productId,
-            selected_size: size || null,
-            selected_color: color || null
-          });
-        if (error) throw error;
-      } catch (error) {
-        console.error("Error removing from cart:", error);
-      }
-    } else {
-      setItems((prev) => prev.filter((item) => 
-        !(item.product.id === productId && item.selectedSize === size && item.selectedColor === color)
-      ));
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .match({ 
+          user_id: user.id, 
+          product_id: productId,
+          selected_size: size || null,
+          selected_color: color || null
+        });
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error removing from cart:", error);
     }
   };
 
@@ -204,45 +170,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('cart_items')
-          .update({ quantity })
-          .match({ 
-            user_id: user.id, 
-            product_id: productId,
-            selected_size: size || null,
-            selected_color: color || null
-          });
-        if (error) throw error;
-      } catch (error) {
-        console.error("Error updating quantity:", error);
-      }
-    } else {
-      setItems((prev) =>
-        prev.map((item) =>
-          (item.product.id === productId && item.selectedSize === size && item.selectedColor === color)
-            ? { ...item, quantity }
-            : item
-        )
-      );
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .update({ quantity })
+        .match({ 
+          user_id: user.id, 
+          product_id: productId,
+          selected_size: size || null,
+          selected_color: color || null
+        });
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error updating quantity:", error);
     }
   };
 
   const clearCart = async () => {
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('cart_items')
-          .delete()
-          .eq('user_id', user.id);
-        if (error) throw error;
-      } catch (error) {
-        console.error("Error clearing cart:", error);
-      }
-    } else {
-      setItems([]);
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', user.id);
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error clearing cart:", error);
     }
   };
 
