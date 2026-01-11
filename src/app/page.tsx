@@ -263,7 +263,7 @@ function PromoBanner() {
               <h3 className="text-3xl font-bold text-white mb-2">Fashion Week</h3>
               <p className="text-white/70 mb-4">Explore the latest trends</p>
               <Link
-                href="/products?category=Fashion & Apparel"
+                href="/products?category=Fashion"
                 className="inline-flex w-fit items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-full font-semibold hover:bg-amber-50 transition-colors"
               >
                 Discover <ArrowRight className="h-4 w-4" />
