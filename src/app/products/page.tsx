@@ -87,17 +87,17 @@ function ProductsContent() {
     return result;
   }, [products, searchQuery, selectedCategory, selectedBrand, selectedTag, priceRange, sortBy]);
 
-  const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedCategory("");
-    setSelectedBrand("");
-    setSelectedTag("");
-    setPriceRange([0, 500]);
-    setSortBy("featured");
-  };
+    const clearFilters = () => {
+      setSearchQuery("");
+      setSelectedCategory("");
+      setSelectedBrand("");
+      setSelectedTag("");
+      setPriceRange([0, 50000]);
+      setSortBy("featured");
+    };
 
-  const hasActiveFilters =
-    searchQuery || selectedCategory || selectedBrand || selectedTag || priceRange[0] > 0 || priceRange[1] < 500;
+    const hasActiveFilters =
+      searchQuery || selectedCategory || selectedBrand || selectedTag || priceRange[0] > 0 || priceRange[1] < 50000;
 
   if (loading) {
     return (
