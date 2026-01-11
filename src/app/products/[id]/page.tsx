@@ -15,11 +15,17 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { Star, Minus, Plus, ShoppingBag, Heart, Truck, Shield, RotateCcw, ChevronLeft, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { user } = useAuth();
+  const router = useRouter();
   
   const { product, loading: prodLoading } = useRealtimeProduct(productId);
   const { products: allProducts, loading: relatedLoading } = useRealtimeProducts({ 
@@ -76,7 +82,30 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login to add items to cart", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
     addToCart(product, quantity, selectedSize, selectedColor);
+    toast.success("Added to cart");
+  };
+
+  const handleToggleWishlist = () => {
+    if (!user) {
+      toast.error("Please login to save items to wishlist", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+    toggleWishlist(product.id);
   };
 
   const discount = product.originalPrice
