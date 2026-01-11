@@ -6,6 +6,7 @@ import Script from "next/script";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "ShopEasy - Your One-Stop Shopping Destination",
