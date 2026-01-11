@@ -6,22 +6,50 @@ import { ProductCard } from "@/components/ProductCard";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { Heart, ShoppingBag, ArrowRight, Loader2, User, LogIn } from "lucide-react";
 
 export default function WishlistPage() {
-  const { wishlist, clearWishlist } = useWishlist();
-  const { products, loading } = useRealtimeProducts();
+  const { user, loading: authLoading } = useAuth();
+  const { wishlist, clearWishlist, loading: wishlistLoading } = useWishlist();
+  const { products, loading: productsLoading } = useRealtimeProducts();
   
   const wishlistProducts = products.filter(product => wishlist.includes(product.id));
 
-  if (loading) {
+  if (authLoading || wishlistLoading || productsLoading) {
     return (
       <div className="min-h-screen bg-stone-50">
         <Header />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
         </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center py-16">
+            <div className="h-32 w-32 mx-auto mb-8 rounded-full bg-stone-100 flex items-center justify-center">
+              <User className="h-16 w-16 text-stone-300" />
+            </div>
+            <h1 className="text-3xl font-bold text-stone-900 mb-4">Please login to view your wishlist</h1>
+            <p className="text-stone-500 mb-8 max-w-md mx-auto">
+              You need to be signed in to save items to your wishlist and view them later.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-amber-500/25 transition-all"
+            >
+              <LogIn className="h-5 w-5" />
+              Login Now
+            </Link>
+          </div>
+        </main>
         <Footer />
       </div>
     );
