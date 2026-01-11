@@ -15,6 +15,7 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
@@ -25,11 +26,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.error('Failed to parse wishlist from localStorage', e);
       }
     }
+    setIsInitialized(true);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    if (isInitialized) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    }
+  }, [wishlist, isInitialized]);
 
   const addToWishlist = (productId: string) => {
     setWishlist(prev => [...new Set([...prev, productId])]);
