@@ -9,6 +9,10 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 interface ProductCardProps {
   product: Product;
   index?: number;
@@ -17,6 +21,8 @@ interface ProductCardProps {
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { user } = useAuth();
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
 
   const discount = product.originalPrice
@@ -24,6 +30,35 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     : null;
 
   const isWishlisted = isInWishlist(product.id);
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please login to save items to wishlist", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+    toggleWishlist(product.id);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please login to add items to cart", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+    addToCart(product);
+    toast.success("Added to cart");
+  };
 
   return (
     <motion.div
@@ -58,10 +93,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       <motion.button
         initial={false}
         animate={{ opacity: isHovered || isWishlisted ? 1 : 0, scale: isHovered || isWishlisted ? 1 : 0.8 }}
-        onClick={(e) => {
-          e.preventDefault();
-          toggleWishlist(product.id);
-        }}
+        onClick={handleToggleWishlist}
         className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-stone-50 transition-colors"
       >
         <Heart
@@ -101,7 +133,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             className="p-2 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white hover:shadow-lg transition-shadow"
           >
             <ShoppingBag className="h-4 w-4" />
