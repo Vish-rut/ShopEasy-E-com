@@ -28,7 +28,7 @@ function HeroSection() {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-amber-700 mb-6 border border-amber-200/60">
               <Sparkles className="h-4 w-4" />
-              New Summer Collection 2024
+              New Collection 2026
             </span>
             <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-stone-900 mb-6 leading-[1.1]">
               Shop Smarter,
