@@ -19,9 +19,9 @@ function ProductsContent() {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedTag, setSelectedTag] = useState(searchParams.get("tag") || "");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [sortBy, setSortBy] = useState("featured");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+    const [sortBy, setSortBy] = useState("featured");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const loading = prodsLoading || catsLoading;
 
