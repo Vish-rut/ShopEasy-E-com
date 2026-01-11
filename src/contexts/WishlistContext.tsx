@@ -24,14 +24,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const fetchWishlist = async () => {
     if (!user) {
-      const savedWishlist = localStorage.getItem('wishlist');
-      if (savedWishlist) {
-        try {
-          setWishlist(JSON.parse(savedWishlist));
-        } catch (e) {
-          console.error('Failed to parse wishlist from localStorage', e);
-        }
-      }
+      setWishlist([]);
       setLoading(false);
       setIsInitialized(true);
       return;
@@ -84,58 +77,41 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
   }, [user]);
 
-  useEffect(() => {
-    if (isInitialized && !user) {
-      localStorage.setItem('wishlist', JSON.stringify(wishlist));
-    }
-  }, [wishlist, isInitialized, user]);
-
   const addToWishlist = async (productId: string) => {
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('wishlists')
-          .upsert({ user_id: user.id, product_id: productId });
-        if (error) throw error;
-      } catch (error) {
-        console.error('Error adding to wishlist:', error);
-      }
-    } else {
-      setWishlist(prev => [...new Set([...prev, productId])]);
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('wishlists')
+        .upsert({ user_id: user.id, product_id: productId });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
     }
   };
 
   const removeFromWishlist = async (productId: string) => {
-    if (user) {
-      try {
-        const { error } = await supabase
-          .from('wishlists')
-          .delete()
-          .match({ user_id: user.id, product_id: productId });
-        if (error) throw error;
-      } catch (error) {
-        console.error('Error removing from wishlist:', error);
-      }
-    } else {
-      setWishlist(prev => prev.filter(id => id !== productId));
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('wishlists')
+        .delete()
+        .match({ user_id: user.id, product_id: productId });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error removing from wishlist:', error);
     }
   };
 
   const toggleWishlist = async (productId: string) => {
+    if (!user) return;
+    
     const isCurrentlyIn = wishlist.includes(productId);
     if (isCurrentlyIn) {
       await removeFromWishlist(productId);
     } else {
       await addToWishlist(productId);
-    }
-    
-    // Optimistic update for guest or if realtime is slow
-    if (!user) {
-        setWishlist(prev => 
-          prev.includes(productId) 
-            ? prev.filter(id => id !== productId) 
-            : [...prev, productId]
-        );
     }
   };
 
