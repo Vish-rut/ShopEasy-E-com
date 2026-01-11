@@ -284,11 +284,11 @@ export default function ProductDetailPage() {
                 <ShoppingBag className="h-5 w-5" />
                 Add to Cart
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toggleWishlist(product.id)}
-                className={`p-4 rounded-xl border transition-colors ${
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleToggleWishlist}
+                  className={`p-4 rounded-xl border transition-colors ${
                   isWishlisted
                     ? "bg-red-50 border-red-200 text-red-500"
                     : "border-stone-200 hover:border-stone-300 text-stone-600"
