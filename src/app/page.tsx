@@ -312,13 +312,13 @@ function TestimonialsSection() {
       content: "Amazing quality products and super fast delivery. ShopEasy has become my go-to store for everything!",
     },
     {
-      name: "Michael Chen",
+      name: "Naman Shah",
       role: "Verified Buyer",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
       content: "The customer service is exceptional. They helped me find exactly what I needed and the prices are unbeatable.",
     },
     {
-      name: "Emily Davis",
+      name: "Rudra Pratap",
       role: "Verified Buyer",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
       content: "I love the variety of products available. From tech gadgets to fashion, theyve got it all!",
