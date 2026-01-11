@@ -3,16 +3,29 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/data";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingBag, ArrowRight } from "lucide-react";
+import { Heart, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function WishlistPage() {
   const { wishlist, clearWishlist } = useWishlist();
+  const { products, loading } = useRealtimeProducts();
   
   const wishlistProducts = products.filter(product => wishlist.includes(product.id));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50">
