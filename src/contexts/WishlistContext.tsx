@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './AuthContext';
 
 interface WishlistContextType {
   wishlist: string[];
@@ -9,6 +11,7 @@ interface WishlistContextType {
   toggleWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
   clearWishlist: () => void;
+  loading: boolean;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -16,44 +19,143 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const savedWishlist = localStorage.getItem('wishlist');
-    if (savedWishlist) {
-      try {
-        setWishlist(JSON.parse(savedWishlist));
-      } catch (e) {
-        console.error('Failed to parse wishlist from localStorage', e);
+  const fetchWishlist = async () => {
+    if (!user) {
+      const savedWishlist = localStorage.getItem('wishlist');
+      if (savedWishlist) {
+        try {
+          setWishlist(JSON.parse(savedWishlist));
+        } catch (e) {
+          console.error('Failed to parse wishlist from localStorage', e);
+        }
       }
+      setLoading(false);
+      setIsInitialized(true);
+      return;
     }
-    setIsInitialized(true);
-  }, []);
+
+    try {
+      const { data, error } = await supabase
+        .from('wishlists')
+        .select('product_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      if (data) {
+        setWishlist(data.map(item => item.product_id));
+      }
+    } catch (error) {
+      console.error('Error fetching wishlist from Supabase:', error);
+    } finally {
+      setLoading(false);
+      setIsInitialized(true);
+    }
+  };
 
   useEffect(() => {
-    if (isInitialized) {
+    fetchWishlist();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('wishlist-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'wishlists',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          fetchWishlist();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (isInitialized && !user) {
       localStorage.setItem('wishlist', JSON.stringify(wishlist));
     }
-  }, [wishlist, isInitialized]);
+  }, [wishlist, isInitialized, user]);
 
-  const addToWishlist = (productId: string) => {
-    setWishlist(prev => [...new Set([...prev, productId])]);
+  const addToWishlist = async (productId: string) => {
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('wishlists')
+          .upsert({ user_id: user.id, product_id: productId });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding to wishlist:', error);
+      }
+    } else {
+      setWishlist(prev => [...new Set([...prev, productId])]);
+    }
   };
 
-  const removeFromWishlist = (productId: string) => {
-    setWishlist(prev => prev.filter(id => id !== productId));
+  const removeFromWishlist = async (productId: string) => {
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('wishlists')
+          .delete()
+          .match({ user_id: user.id, product_id: productId });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error removing from wishlist:', error);
+      }
+    } else {
+      setWishlist(prev => prev.filter(id => id !== productId));
+    }
   };
 
-  const toggleWishlist = (productId: string) => {
-    setWishlist(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId) 
-        : [...prev, productId]
-    );
+  const toggleWishlist = async (productId: string) => {
+    const isCurrentlyIn = wishlist.includes(productId);
+    if (isCurrentlyIn) {
+      await removeFromWishlist(productId);
+    } else {
+      await addToWishlist(productId);
+    }
+    
+    // Optimistic update for guest or if realtime is slow
+    if (!user) {
+        setWishlist(prev => 
+          prev.includes(productId) 
+            ? prev.filter(id => id !== productId) 
+            : [...prev, productId]
+        );
+    }
   };
 
   const isInWishlist = (productId: string) => wishlist.includes(productId);
 
-  const clearWishlist = () => setWishlist([]);
+  const clearWishlist = async () => {
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('wishlists')
+          .delete()
+          .eq('user_id', user.id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error clearing wishlist:', error);
+      }
+    } else {
+      setWishlist([]);
+    }
+  };
 
   return (
     <WishlistContext.Provider value={{ 
@@ -62,7 +164,8 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       removeFromWishlist, 
       toggleWishlist, 
       isInWishlist,
-      clearWishlist 
+      clearWishlist,
+      loading
     }}>
       {children}
     </WishlistContext.Provider>
