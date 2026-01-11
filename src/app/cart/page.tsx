@@ -11,8 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 function CartContent() {
   const { items, updateQuantity, removeFromCart, total, clearCart } = useCart();
 
-  const shipping = total > 50 ? 0 : 9.99;
-  const tax = total * 0.08;
+  const shipping = total > 500 ? 0 : 99;
+  const tax = total * 0.12;
   const grandTotal = total + shipping + tax;
 
   if (items.length === 0) {
@@ -122,11 +122,11 @@ function CartContent() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-stone-900">
-                            ${(item.product.price * item.quantity).toFixed(2)}
+                            ₹{(item.product.price * item.quantity).toLocaleString("en-IN")}
                           </p>
                           {item.quantity > 1 && (
                             <p className="text-sm text-stone-500">
-                              ${item.product.price.toFixed(2)} each
+                              ₹{item.product.price.toLocaleString("en-IN")} each
                             </p>
                           )}
                         </div>
@@ -160,15 +160,15 @@ function CartContent() {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-stone-600">
                   <span>Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between text-stone-600">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? "Free" : `₹${shipping.toLocaleString("en-IN")}`}</span>
                 </div>
                 <div className="flex justify-between text-stone-600">
-                  <span>Tax (8%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>Tax (12%)</span>
+                  <span>₹{tax.toLocaleString("en-IN")}</span>
                 </div>
                 {shipping === 0 && (
                   <p className="text-sm text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
@@ -177,7 +177,7 @@ function CartContent() {
                 )}
                 {shipping > 0 && (
                   <p className="text-sm text-stone-500">
-                    Add ${(50 - total).toFixed(2)} more for free shipping
+                    Add ₹{(500 - total).toLocaleString("en-IN")} more for free shipping
                   </p>
                 )}
               </div>
@@ -185,7 +185,7 @@ function CartContent() {
               <div className="border-t border-stone-200 pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold text-stone-900">
                   <span>Total</span>
-                  <span>${grandTotal.toFixed(2)}</span>
+                  <span>₹{grandTotal.toLocaleString("en-IN")}</span>
                 </div>
               </div>
 
