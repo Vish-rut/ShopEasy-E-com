@@ -23,11 +23,11 @@ function LoginContent() {
     setError("");
     setIsLoading(true);
 
-    const success = await login(email, password);
-    if (success) {
+    const result = await login(email, password);
+    if (result.success) {
       router.push("/");
     } else {
-      setError("Invalid email or password. Password must be at least 6 characters.");
+      setError(result.error || "Invalid email or password.");
     }
     setIsLoading(false);
   };
