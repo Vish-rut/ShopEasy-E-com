@@ -7,8 +7,8 @@ import { supabase } from "@/lib/supabase";
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -52,15 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return !error;
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true };
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -70,7 +75,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     });
-    return !error;
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    // If session is null but no error, it usually means email confirmation is required
+    if (!data.session && data.user) {
+      return { success: true, error: "Please check your email to confirm your account." };
+    }
+
+    return { success: true };
   };
 
   const logout = async () => {
