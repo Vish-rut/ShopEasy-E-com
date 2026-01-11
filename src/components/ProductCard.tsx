@@ -87,16 +87,16 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <p className="text-xs text-stone-500 mb-3">{product.brand}</p>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-stone-900">
-              ${product.price.toFixed(2)}
-            </span>
-            {product.originalPrice && (
-              <span className="text-sm text-stone-400 line-through">
-                ${product.originalPrice.toFixed(2)}
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-bold text-stone-900">
+                ₹{product.price.toLocaleString("en-IN")}
               </span>
-            )}
-          </div>
+              {product.originalPrice && (
+                <span className="text-sm text-stone-400 line-through">
+                  ₹{product.originalPrice.toLocaleString("en-IN")}
+                </span>
+              )}
+            </div>
 
           <motion.button
             whileHover={{ scale: 1.05 }}
