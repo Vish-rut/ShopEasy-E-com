@@ -36,11 +36,17 @@ function RegisterContent() {
 
     setIsLoading(true);
 
-    const success = await register(name, email, password);
-    if (success) {
-      router.push("/");
+    const result = await register(name, email, password);
+    if (result.success) {
+      if (result.error) {
+        // This is the case where success is true but an error (message) exists, 
+        // which we used for email confirmation info
+        setError(result.error);
+      } else {
+        router.push("/");
+      }
     } else {
-      setError("Registration failed. Please try again.");
+      setError(result.error || "Registration failed. Please try again.");
     }
     setIsLoading(false);
   };
