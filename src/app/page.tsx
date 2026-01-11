@@ -318,7 +318,7 @@ function TestimonialsSection() {
       content: "The customer service is exceptional. They helped me find exactly what I needed and the prices are unbeatable.",
     },
     {
-      name: "Rudra Pratap",
+      name: "Riya Arora",
       role: "Verified Buyer",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
       content: "I love the variety of products available. From tech gadgets to fashion, theyve got it all!",
