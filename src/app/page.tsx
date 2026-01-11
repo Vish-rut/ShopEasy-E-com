@@ -103,7 +103,7 @@ function HeroSection() {
 
 function FeaturesSection() {
   const features = [
-    { icon: Truck, title: "Free Shipping", description: "On orders over $50" },
+    { icon: Truck, title: "Free Shipping", description: "On orders over ₹500" },
     { icon: Shield, title: "Secure Payment", description: "100% secure checkout" },
     { icon: CreditCard, title: "Easy Returns", description: "30-day return policy" },
     { icon: HeadphonesIcon, title: "24/7 Support", description: "Dedicated support" },
