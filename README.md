@@ -144,7 +144,7 @@ This project is licensed under the **MIT License**.
 
 **Vishrut**
 
-* GitHub: (https://github.com/Vish-rut)
+* GitHub: https://github.com/Vish-rut
 * Portfolio: https://portfolio-vishrut-15.vercel.app/
 ---
 
