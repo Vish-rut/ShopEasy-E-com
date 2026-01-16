@@ -16,8 +16,7 @@ function CartContent() {
   const { items, updateQuantity, removeFromCart, total, clearCart, loading: cartLoading } = useCart();
 
   const shipping = total > 500 ? 0 : 99;
-  const tax = total * 0.12;
-  const grandTotal = total + shipping + tax;
+  const grandTotal = total + shipping;
 
   if (authLoading || cartLoading) {
     return (
@@ -197,29 +196,25 @@ function CartContent() {
               <h2 className="text-lg font-semibold text-stone-900 mb-6">Order Summary</h2>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-stone-600">
-                  <span>Subtotal</span>
-                  <span>₹{total.toLocaleString("en-IN")}</span>
+                  <div className="flex justify-between text-stone-600">
+                    <span>Subtotal (incl. taxes)</span>
+                    <span>₹{total.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between text-stone-600">
+                    <span>Shipping</span>
+                    <span>{shipping === 0 ? "Free" : `₹${shipping.toLocaleString("en-IN")}`}</span>
+                  </div>
+                  {shipping === 0 && (
+                    <p className="text-sm text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
+                      You qualify for free shipping!
+                    </p>
+                  )}
+                  {shipping > 0 && (
+                    <p className="text-sm text-stone-500">
+                      Add ₹{(500 - total).toLocaleString("en-IN")} more for free shipping
+                    </p>
+                  )}
                 </div>
-                <div className="flex justify-between text-stone-600">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? "Free" : `₹${shipping.toLocaleString("en-IN")}`}</span>
-                </div>
-                <div className="flex justify-between text-stone-600">
-                  <span>Tax (12%)</span>
-                  <span>₹{tax.toLocaleString("en-IN")}</span>
-                </div>
-                {shipping === 0 && (
-                  <p className="text-sm text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg">
-                    You qualify for free shipping!
-                  </p>
-                )}
-                {shipping > 0 && (
-                  <p className="text-sm text-stone-500">
-                    Add ₹{(500 - total).toLocaleString("en-IN")} more for free shipping
-                  </p>
-                )}
-              </div>
 
               <div className="border-t border-stone-200 pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold text-stone-900">
@@ -244,14 +239,16 @@ function CartContent() {
                 </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-amber-500/25 transition-all"
-              >
-                <CreditCard className="h-5 w-5" />
-                Proceed to Checkout
-              </motion.button>
+<Link href="/checkout">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-amber-500/25 transition-all"
+                  >
+                    <CreditCard className="h-5 w-5" />
+                    Proceed to Checkout
+                  </motion.button>
+                </Link>
 
               <div className="flex items-center justify-center gap-2 mt-4 text-sm text-stone-500">
                 <Lock className="h-4 w-4" />

@@ -90,17 +90,20 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
       </Link>
 
-      <motion.button
-        initial={false}
-        animate={{ opacity: isHovered || isWishlisted ? 1 : 0, scale: isHovered || isWishlisted ? 1 : 0.8 }}
-        onClick={handleToggleWishlist}
-        className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-stone-50 transition-colors"
-      >
-        <Heart
-          className={`h-4 w-4 transition-colors ${
-            isWishlisted ? "fill-red-500 text-red-500" : "text-stone-400"
+<motion.button
+          initial={false}
+          animate={{ opacity: isHovered || isWishlisted ? 1 : 1, scale: 1 }}
+          onClick={handleToggleWishlist}
+          className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-lg transition-colors ${
+            isWishlisted ? "bg-red-50 hover:bg-red-100" : "bg-white hover:bg-stone-50"
           }`}
-        />
+          title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`h-4 w-4 transition-colors ${
+              isWishlisted ? "fill-red-500 text-red-500" : "text-stone-400"
+            }`}
+          />
       </motion.button>
 
       <div className="p-4">
@@ -119,16 +122,19 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <p className="text-xs text-stone-500 mb-3">{product.brand}</p>
 
         <div className="flex items-center justify-between">
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-stone-900">
-                ₹{product.price.toLocaleString("en-IN")}
-              </span>
-              {product.originalPrice && (
-                <span className="text-sm text-stone-400 line-through">
-                  ₹{product.originalPrice.toLocaleString("en-IN")}
-                </span>
-              )}
-            </div>
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-stone-900">
+                    ₹{product.price.toLocaleString("en-IN")}
+                  </span>
+                  {product.originalPrice && (
+                    <span className="text-sm text-stone-400 line-through">
+                      ₹{product.originalPrice.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs text-stone-500">incl. taxes</span>
+              </div>
 
           <motion.button
             whileHover={{ scale: 1.05 }}

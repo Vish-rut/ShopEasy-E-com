@@ -29,7 +29,7 @@ export function Header() {
     { href: "/", label: "Home" },
     { href: "/products", label: "Shop" },
     { href: "/products?category=Electronics", label: "Electronics" },
-    { href: "/products?category=Fashion", label: "Fashion" },
+    { href: "/products?category=Fashion%20%26%20Apparel", label: "Fashion" },
     { href: "/products?tag=sale", label: "Sale" },
   ];
 

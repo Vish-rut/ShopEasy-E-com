@@ -105,7 +105,7 @@ function FeaturesSection() {
   const features = [
     { icon: Truck, title: "Free Shipping", description: "On orders over ₹500" },
     { icon: Shield, title: "Secure Payment", description: "100% secure checkout" },
-    { icon: CreditCard, title: "Easy Returns", description: "30-day return policy" },
+    { icon: CreditCard, title: "Easy Returns", description: "10-day return policy" },
     { icon: HeadphonesIcon, title: "24/7 Support", description: "Dedicated support" },
   ];
 
@@ -263,7 +263,7 @@ function PromoBanner() {
               <h3 className="text-3xl font-bold text-white mb-2">Fashion Week</h3>
               <p className="text-white/70 mb-4">Explore the latest trends</p>
               <Link
-                href="/products?category=Fashion"
+                href="/products?category=Fashion%20%26%20Apparel"
                 className="inline-flex w-fit items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-full font-semibold hover:bg-amber-50 transition-colors"
               >
                 Discover <ArrowRight className="h-4 w-4" />

@@ -192,16 +192,19 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <div className="flex items-baseline gap-4">
-              <span className="text-4xl font-bold text-stone-900">
-                ₹{product.price.toLocaleString("en-IN")}
-              </span>
-              {product.originalPrice && (
-                <span className="text-xl text-stone-400 line-through">
-                  ₹{product.originalPrice.toLocaleString("en-IN")}
-                </span>
-              )}
-            </div>
+            <div>
+                <div className="flex items-baseline gap-4">
+                  <span className="text-4xl font-bold text-stone-900">
+                    ₹{product.price.toLocaleString("en-IN")}
+                  </span>
+                  {product.originalPrice && (
+                    <span className="text-xl text-stone-400 line-through">
+                      ₹{product.originalPrice.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm text-stone-500">Price inclusive of all taxes</span>
+              </div>
 
             <p className="text-stone-600 leading-relaxed">{product.description}</p>
 
@@ -302,7 +305,7 @@ export default function ProductDetailPage() {
                 {[
                   { icon: Truck, label: "Free Shipping", desc: "Orders over ₹500" },
                   { icon: Shield, label: "Secure Payment", desc: "100% secure" },
-                  { icon: RotateCcw, label: "Easy Returns", desc: "30 days" },
+                  { icon: RotateCcw, label: "Easy Returns", desc: "10 days" },
                 ].map((feature) => (
                 <div key={feature.label} className="text-center">
                   <div className="h-10 w-10 mx-auto mb-2 rounded-lg bg-amber-100 flex items-center justify-center">

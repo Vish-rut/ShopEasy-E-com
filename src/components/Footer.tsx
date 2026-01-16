@@ -8,7 +8,7 @@ export function Footer() {
     shop: [
       { label: "All Products", href: "/products" },
       { label: "Electronics", href: "/products?category=Electronics" },
-      { label: "Fashion", href: "/products?category=Fashion" },
+      { label: "Fashion", href: "/products?category=Fashion%20%26%20Apparel" },
       { label: "Home & Living", href: "/products?category=Home+%26+Living" },
       { label: "Sale", href: "/products?tag=sale" },
     ],
